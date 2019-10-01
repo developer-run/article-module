@@ -1,0 +1,22 @@
+<div n:block="detail" class="well well-lg" >
+
+	<h2 class="text-primary">log {$item->inserted|date:"j. n. Y h:m:s"}</h2>
+
+
+	{formContainer items_detail_form-$item->id}
+		{input id, value => $item->id}
+
+		<div class="form-group">
+
+			{label header /}
+			{input header, value => $item->header   }
+
+		</div>
+
+		{input save}
+
+
+	{/formContainer}
+
+
+</div>

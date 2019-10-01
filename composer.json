@@ -1,0 +1,45 @@
+{
+  "name": "devrun/article-module",
+  "description": "DevRun Article module",
+  "keywords": ["cms", "nette", "devrun", "article"],
+  "minimum-stability": "stable",
+  "homepage": "http://devrun.cz",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Pavel Paulík"
+    }
+  ],
+  "require": {
+    "devrun/cms-module": "^0.8",
+    "zenify/doctrine-behaviors": "^4.2"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/developer-run/framework"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/developer-run/cms-module"
+    }
+  ],
+  "autoload": {
+    "classmap": ["src/"]
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "0.8-dev"
+    },
+    "devrun": {
+      "configuration": {
+        "article": {
+          "publicModule": true
+        },
+        "extensions": {
+          "article": "Devrun\\ArticleModule\\DI\\ArticleExtension"
+        }
+      }
+    }
+  }
+}

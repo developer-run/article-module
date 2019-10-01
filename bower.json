@@ -1,0 +1,21 @@
+{
+  "name": "devrun-article-module",
+  "version": "0.1.0",
+  "dependencies": {
+    "ckeditor": "^4.6.2"
+  },
+  "authors": [
+    "Pavel Paulík <pavel.paulik@support.etnetera.cz>"
+  ],
+  "description": "modul článků",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

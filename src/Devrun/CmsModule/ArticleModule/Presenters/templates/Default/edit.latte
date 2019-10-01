@@ -1,0 +1,89 @@
+{block headerTitle}Editace článku{/block}
+{*{block headerSmallTitle}základní{/block}*}
+{block breadcrumb}
+<li n:block="breadcrumbItems"><a n:href=":Cms:Dashboard:"><i class="fa fa-dashboard"></i> {_admin.home}</a></li>
+<li><a n:href=":Cms:Article:Default:"><i class="fa fa-dashboard"></i> Seznam článků</a></li>
+<li class="active">článek {$article->id}</li>
+{/block}
+
+{block content}
+<div class="box box-solid box-primary bg-green-gradient">
+	<div class="box-header">
+		<i class="fa fa-edit"></i>
+		<h3 class="box-title">{$article->namespace} {if $article->route}[{$article->route->package->name}]{/if}</h3>
+	</div>
+	<div class="box-footer text-black">
+
+		{form articleForm}
+
+			{foreach $form->getComponents() as $name => $component}
+				{if $component instanceOf Nette\Forms\Controls\HiddenField && $name != '_do'}
+					<div class="form-group">
+						<div class="col-sm-2 control-label">
+							<label>{$name|firstUpper}</label>
+						</div>
+						<div class="col-sm-10">
+							{input $name}
+							<p class="ck-inline cke_chrome" style="padding: 1em;" contenteditable="true" data-copy="[name='{$name}']" >{$component->value|noescape}</p>
+						</div>
+					</div>
+
+				{elseif $component instanceOf Nette\Forms\Controls\BaseControl}
+					<div class="form-group">
+						<div class="col-sm-2 control-label">
+							{label $name /}
+						</div>
+						<div class="col-sm-10">
+							{input $name}
+						</div>
+
+					</div>
+				{/if}
+			{/foreach}
+		{/form}
+
+
+		{*{control articleForm}*}
+	</div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        var introduction = $('textarea.editable:not(.cke_editable)');
+
+
+        $.each(introduction, function(index, value) {
+
+            CKEDITOR.replace( this, {
+                // Allow some non-standard markup that we used in the introduction.
+                extraAllowedContent: 'a(documentation);abbr[title];code',
+                removePlugins: 'stylescombo',
+                extraPlugins: 'sourcedialog',
+                // Show toolbar on startup (optional).
+                startupFocus: true
+            } );
+
+
+        });
+
+
+        var inlines = $('.ck-inline:not(.cke_editable)');
+
+
+/*
+        $.each(inlines, function(index, value) {
+            CKEDITOR.inline( this, {
+                // Allow some non-standard markup that we used in the introduction.
+                 extraAllowedContent: 'a(documentation);abbr[title];code',
+                 removePlugins: 'stylescombo',
+                 extraPlugins: 'sourcedialog',
+                // Show toolbar on startup (optional).
+                 startupFocus: true
+            } );
+
+        });
+*/
+
+    });
+</script>
