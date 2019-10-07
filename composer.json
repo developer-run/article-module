@@ -11,8 +11,8 @@
     }
   ],
   "require": {
-    "devrun/cms-module": "^0.8",
-    "zenify/doctrine-behaviors": "^4.2"
+    "devrun/framework": "^0.8",
+    "devrun/cms-module": "^0.8"
   },
   "repositories": [
     {
