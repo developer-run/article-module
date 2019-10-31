@@ -36,6 +36,9 @@ class PageArticlesControl extends AdminControl
     public function render()
     {
         $template = $this->getTemplate();
+        $link = $this->getPresenter()->link(':Cms:Article:Translate:update');
+
+        $template->link = $link;
         $template->render();
     }
 
