@@ -13,6 +13,10 @@ use Devrun\ArticleModule\Entities\ArticleEntity;
 use Devrun\ArticleModule\Repositories\Queries\ArticleQuery;
 use Kdyby\Doctrine\EntityRepository;
 
+/**
+ * Class ArticleRepository
+ * @package Devrun\ArticleModule\Repositories
+ */
 class ArticleRepository extends EntityRepository
 {
     const CATEGORY_UNKNOWN = 'unknown';
