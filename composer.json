@@ -2,7 +2,7 @@
   "name": "devrun/article-module",
   "description": "DevRun Article module",
   "keywords": ["cms", "nette", "devrun", "article"],
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
   "homepage": "http://devrun.cz",
   "license": "proprietary",
   "authors": [
@@ -11,8 +11,8 @@
     }
   ],
   "require": {
-    "devrun/framework": "^0.8",
-    "devrun/cms-module": "^0.8"
+    "devrun/framework": "v0.8.*",
+    "devrun/cms-module": "v0.8.*"
   },
   "repositories": [
     {
@@ -32,6 +32,7 @@
       "dev-master": "0.8-dev"
     },
     "devrun": {
+      "installers" : ["Devrun\\Module\\Installers\\MigrationInstaller"],
       "configuration": {
         "article": {
           "publicModule": true
