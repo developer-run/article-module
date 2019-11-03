@@ -12,7 +12,8 @@
   ],
   "require": {
     "devrun/framework": "v0.8.*",
-    "devrun/cms-module": "v0.8.*"
+    "devrun/cms-module": "v0.8.*",
+    "devrun/ckeditor-module": "4.*"
   },
   "repositories": [
     {
@@ -22,6 +23,10 @@
     {
       "type": "vcs",
       "url": "https://github.com/developer-run/cms-module"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/developer-run/ckeditor-module"
     }
   ],
   "autoload": {
