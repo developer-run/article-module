@@ -1,6 +1,6 @@
 {
   "name": "devrun-article",
-  "description": "Developer Run CMS",
+  "description": "Developer Run CMS-article",
   "version": "0.1.2",
   "keywords": ["nette", "devrun", "cms"],
   "author": "Pavel Paulik"
