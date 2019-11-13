@@ -1,0 +1,12 @@
+services:
+
+	cms.article.presenters.default:
+		class: Devrun\CmsModule\ArticleModule\Presenters\DefaultPresenter
+		tags: [devrun.presenter, administration: [
+			link: ':Cms:Article:Default:default'
+			icon: fa-file-word-o
+			category: Content
+			name: 'Articles'
+			description: 'Manage articles, edit content...'
+			priority: 10
+		]]

@@ -1,0 +1,9 @@
+services:
+
+	cms.article.controls.pageArticlesControl:
+		implement: Devrun\CmsModule\ArticleModule\Controls\IPageArticlesControlFactory
+		tags: [devrun.control, administration: [
+			category: PageContent
+			name: Články na stránce  #admin.article.page_settings
+		]]
+		inject: true

@@ -2,24 +2,7 @@ translation:
 #	dirs: ['%modules.article.path%/resources/translations']  # moved
 	dirs: ['%appDir%/modules/article-module/resources/translations']
 
-services:
-
-	cms.article.presenters.default:
-		class: Devrun\CmsModule\ArticleModule\Presenters\DefaultPresenter
-		tags: [devrun.presenter, administration: [
-			link: ':Cms:Article:Default:default'
-			icon: fa-file-word-o
-			category: Content
-			name: 'Articles'
-			description: 'Manage articles, edit content...'
-			priority: 10
-		]]
-
-	cms.article.controls.pageArticlesControl:
-		implement: Devrun\CmsModule\ArticleModule\Controls\IPageArticlesControlFactory
-		tags: [devrun.control, administration: [
-			category: PageContent
-			name: Články na stránce  #admin.article.page_settings
-		]]
-		inject: true
-
+includes:
+	- presenters.neon
+	- components.neon
+	- authorizator.neon

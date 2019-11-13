@@ -1,0 +1,16 @@
+services:
+	acl:
+		factory: Devrun\Security\Authorizator
+		setup:
+# ------------------------------------------------------ #
+			- addResource(Cms:Article:Default)
+			- allow(member, Cms:Article:Default, edit)
+			- allow(admin, Cms:Article:Default, ['edit', 'resetArticles'])
+			- deny(admin, Cms:Article:Default, editAllArticleAttributes)
+			- allow(admin, Cms:Article:Default, ['edit', 'editAllArticles', 'editAllArticleAttributes'])
+
+# ------------------------------------------------------ #
+			- addResource(Cms:Article:Translate)
+			- allow(member, Cms:Article:Translate, update)
+
+# ------------------------------------------------------ #
