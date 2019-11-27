@@ -3,6 +3,7 @@
   "description": "DevRun Article module",
   "keywords": ["cms", "nette", "devrun", "article"],
   "minimum-stability": "dev",
+  "version": "v0.8.2",
   "homepage": "http://devrun.cz",
   "license": "proprietary",
   "authors": [
@@ -39,9 +40,6 @@
     "devrun": {
       "installers" : ["Devrun\\Module\\Installers\\MigrationInstaller"],
       "configuration": {
-        "article": {
-          "publicModule": true
-        },
         "extensions": {
           "article": "Devrun\\ArticleModule\\DI\\ArticleExtension"
         }
