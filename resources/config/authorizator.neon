@@ -7,7 +7,7 @@ services:
 			- allow(member, Cms:Article:Default, edit)
 			- allow(admin, Cms:Article:Default, ['edit', 'resetArticles'])
 			- deny(admin, Cms:Article:Default, editAllArticleAttributes)
-			- allow(admin, Cms:Article:Default, ['edit', 'editAllArticles', 'editAllArticleAttributes'])
+			- allow(supervisor, Cms:Article:Default, ['editAllArticles', 'editAllArticleAttributes'])
 
 # ------------------------------------------------------ #
 			- addResource(Cms:Article:Translate)
