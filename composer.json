@@ -2,9 +2,10 @@
   "name": "devrun/article-module",
   "description": "DevRun Article module",
   "keywords": ["cms", "nette", "devrun", "article"],
-  "version": "v0.8.2",
   "homepage": "http://devrun.cz",
   "license": "proprietary",
+  "version": "v0.8.3",
+  "minimum-stability": "dev",
   "authors": [
     {
       "name": "Pavel Paulík"
@@ -13,7 +14,7 @@
   "require": {
     "devrun/framework": "v0.8.*",
     "devrun/cms-module": "v0.8.*",
-    "devrun/ckeditor-module": "4.*"
+    "devrun/ckeditor-module": "v4.*"
   },
   "repositories": [
     {
@@ -26,11 +27,18 @@
     },
     {
       "type": "vcs",
+      "url": "https://github.com/developer-run/doctrine-module"
+    },
+    {
+      "type": "vcs",
       "url": "https://github.com/developer-run/ckeditor-module"
     }
   ],
   "autoload": {
     "classmap": ["src/"]
+  },
+  "config": {
+    "vendor-dir": "../../../vendor"
   },
   "extra": {
     "branch-alias": {

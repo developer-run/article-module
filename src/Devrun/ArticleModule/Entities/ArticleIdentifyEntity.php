@@ -10,9 +10,9 @@
 namespace Devrun\ArticleModule\Entities;
 
 use Devrun\CmsModule\InvalidArgumentException;
+use Devrun\DoctrineModule\Entities\IdentifiedEntityTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Kdyby\Doctrine\Entities\Attributes\Identifier;
 use Kdyby\Doctrine\Entities\MagicAccessors;
 
 /**
@@ -31,7 +31,7 @@ use Kdyby\Doctrine\Entities\MagicAccessors;
 class ArticleIdentifyEntity
 {
 
-    use Identifier;
+    use IdentifiedEntityTrait;
     use MagicAccessors;
 
 

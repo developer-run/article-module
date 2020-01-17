@@ -11,9 +11,6 @@ namespace Devrun\ArticleModule\Entities;
 
 use Devrun;
 use Devrun\CmsModule\Entities\PageEntity;
-use Devrun\Doctrine\Entities\Attributes\Translatable;
-use Devrun\Doctrine\Entities\BlameableTrait;
-use Devrun\Doctrine\Entities\DateTimeTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Kdyby\Doctrine\Entities\Attributes\Identifier;
@@ -39,11 +36,10 @@ use Zenify\DoctrineBehaviors\Entities\Attributes\Translatable as ZenifyTranslata
 class ArticleEntity
 {
     use MagicAccessors;
-
     use Identifier;
-    use DateTimeTrait;
-    use BlameableTrait;
-    use Translatable;
+    use Devrun\DoctrineModule\Entities\DateTimeTrait;
+    use Devrun\CmsModule\Entities\BlameableTrait;
+    use Devrun\DoctrineModule\Entities\Attributes\Translatable;
 //    use ZenifyTranslatable;
 
 
