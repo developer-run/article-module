@@ -13,9 +13,8 @@ use Devrun\ArticleModule\Entities\ArticleEntity;
 use Devrun\ArticleModule\Repositories\ArticleRepository;
 use Devrun\CmsModule\ArticleModule\Forms\IArticleFormFactory;
 use Kdyby\Doctrine\EntityManager;
-use Nette\Object;
 
-class ArticleFacade extends Object
+class ArticleFacade
 {
 
     /** @var ArticleRepository */

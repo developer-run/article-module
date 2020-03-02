@@ -4,7 +4,6 @@
   "keywords": ["cms", "nette", "devrun", "article"],
   "homepage": "http://devrun.cz",
   "license": "proprietary",
-  "version": "v0.8.3",
   "minimum-stability": "dev",
   "authors": [
     {
