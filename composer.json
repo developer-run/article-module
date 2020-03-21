@@ -11,9 +11,8 @@
     }
   ],
   "require": {
-    "devrun/framework": "v0.8.*",
-    "devrun/cms-module": "v0.8.*",
-    "devrun/ckeditor-module": "v4.*"
+    "devrun/cms-module": "v0.9.*",
+    "devrun/ckeditor-module": "v5.*"
   },
   "repositories": [
     {
@@ -23,6 +22,10 @@
     {
       "type": "vcs",
       "url": "https://github.com/developer-run/cms-module"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/developer-run/monolog"
     },
     {
       "type": "vcs",
@@ -41,7 +44,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "0.8-dev"
+      "dev-master": "0.9-dev"
     },
     "devrun": {
       "installers" : ["Devrun\\Module\\Installers\\MigrationInstaller"],

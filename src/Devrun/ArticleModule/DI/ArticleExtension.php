@@ -11,14 +11,13 @@ namespace Devrun\ArticleModule\DI;
 
 use Devrun\ArticleModule\Entities\ArticleEntity;
 use Devrun\Config\CompilerExtension;
-use Flame\Modules\Providers\IPresenterMappingProvider;
 use Kdyby\Doctrine\DI\IEntityProvider;
 use Kdyby\Doctrine\DI\OrmExtension;
 use Kdyby\Events\DI\EventsExtension;
 use Nette;
 use Nette\DI\ContainerBuilder;
 
-class ArticleExtension extends CompilerExtension implements IEntityProvider, IPresenterMappingProvider
+class ArticleExtension extends CompilerExtension implements IEntityProvider
 {
     public $defaults = array(
         'lifeTime' => [
