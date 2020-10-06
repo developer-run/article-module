@@ -22,7 +22,9 @@ use Devrun\CmsModule\TranslateException;
 use Nette\Forms\Container;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\Html;
+use Nette\Utils\Strings;
 use Tracy\Debugger;
+use Ublaboo\DataGrid\Column\Action\Confirmation\StringConfirmation;
 
 class DefaultPresenter extends AdminPresenter
 {
@@ -167,6 +169,24 @@ class DefaultPresenter extends AdminPresenter
     }
 
 
+    /**
+     * return options for article column [ header, subheader , refHeader = header ... ]
+     *
+     * @param ArticleEntity $articleEntity
+     * @param $column
+     * @return array|null
+     */
+    public function getOptionsFor(ArticleEntity $articleEntity, $column)
+    {
+        if ($options = $articleEntity->getIdentify()->getOptions()) {
+            $column = lcfirst(Strings::replace($column, '/ref/'));
+            return $articleEntity->getIdentify()->getOptions()[$column] ?? [];
+        }
+
+        return null;
+    }
+
+
     protected function createComponentGrid($name)
     {
         $grid = $this->createGrid($name);
@@ -187,15 +207,26 @@ class DefaultPresenter extends AdminPresenter
         /** @var ArticleEntity[] $articles */
         $articles = $query->getQuery()->getResult();
 
+//        dump($articles);
+//        die;
+
         $modules = [];
         $packages = [];
         foreach ($articles as $article) {
             if ($article->getRoute()) {
+
+//                dump($article->getRoute()->getPackage()->getModule());
+//                dump($article->getRoute());
+//                die;
+
                 $modules[$article->getRoute()->getPackage()->getModule()] = ucfirst($article->getRoute()->getPackage()->getModule());
                 $packages[$article->getRoute()->getPackage()->getName()] = ucfirst($article->getRoute()->getPackage()->getName());
             }
         }
 
+//        dump($modules);
+//        dump($packages);
+//        die;
 
         $query = $this->articleFacade->getArticleRepository()->createQueryBuilder('e')
             ->addSelect('r')
@@ -290,7 +321,7 @@ class DefaultPresenter extends AdminPresenter
                 $queryBuilder->andWhere('pa.name = :name')->setParameter('name', $value);
             });
 
-        $grid->addColumnText('presenter', 'Page', 'route.page.presenter')
+        $grid->addColumnText('presenter', 'Stránka', 'route.page.presenter')
             ->setSortable()
             ->setFilterText()
             ->setCondition(function (\Kdyby\Doctrine\QueryBuilder $queryBuilder, $value) {
@@ -373,18 +404,14 @@ class DefaultPresenter extends AdminPresenter
 
 
             $grid->addAction('softDelete', 'Soft delete', 'softDelete!')
-                ->setIcon('trash fa-2x')
-                ->setClass('_ajax btn btn-xs btn-warning')
-                ->setConfirm(function ($item) {
-                    return "Opravdu chcete smazat článek [id: {$item->id} {$item->namespace}]?";
-                });
+//                ->setIcon('trash fa-2x')
+//                ->setClass('_ajax btn btn-xs btn-warning')
+                ->setConfirmation(new StringConfirmation("Opravdu chcete smazat článek [%s]?", "id"));
 
             $grid->addAction('delete', 'Delete', 'delete!')
                 ->setIcon('trash fa-2x')
                 ->setClass('_ajax btn btn-xs btn-danger')
-                ->setConfirm(function ($item) {
-                    return "Opravdu chcete smazat článek [id: {$item->id} {$item->namespace}]?";
-                });
+                ->setConfirmation(new StringConfirmation("Opravdu chcete smazat článek [%s]?", "id"));
 
         }
 
@@ -392,9 +419,7 @@ class DefaultPresenter extends AdminPresenter
             $grid->addAction('reset', 'Reset', 'reset!')
                 ->setIcon('superpowers fa-2x')
                 ->setClass('ajax btn btn-xs btn-warning')
-                ->setConfirm(function ($item) {
-                    return "Opravdu chcete resetovat článek [id: {$item->id} {$item->namespace}]?";
-                });
+                ->setConfirmation(new StringConfirmation("Opravdu chcete resetovat článek [%s]?", "id"));
 
 
             $grid->addGroupAction('Reset articles')->onSelect[] = [$this, 'resetArticles'];

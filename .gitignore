@@ -2,6 +2,8 @@
 .idea
 
 ### Composer template
+bootstrap.php
+phpunit-config.xml
 composer.phar
 composer.lock
 /vendor/

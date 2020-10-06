@@ -13,15 +13,16 @@ use Devrun\ArticleModule\Entities\ArticleEntity;
 use Devrun\ArticleModule\Entities\ArticleIdentifyEntity;
 use Devrun\ArticleModule\Entities\ArticleTranslationEntity;
 use Devrun\ArticleModule\Repositories\ArticleRepository;
+use Devrun\CmsModule\Entities\PackageEntity;
+use Devrun\CmsModule\Entities\PageEntity;
 use Devrun\CmsModule\Entities\RouteEntity;
-use Devrun\CmsModule\Repositories\RouteRepository;
-use Devrun\Utils\Strings;
+use Devrun\CmsModule\NotFoundResourceException;
+use Devrun\CmsModule\Presenters\TCmsPresenter;
+use Kdyby\Doctrine\EntityManager;
 use Kdyby\Events\Subscriber;
 use Kdyby\Translation\Translator;
-use Nette\Application\Application;
 use Nette\Application\Request;
 use Nette\Application\UI\Presenter;
-use Tracy\Debugger;
 
 class ArticlePipe implements Subscriber
 {
@@ -29,8 +30,8 @@ class ArticlePipe implements Subscriber
     /** @var ArticleRepository */
     private $articleRepository;
 
-    /** @var RouteRepository */
-    private $routeRepository;
+    /** @var EntityManager */
+    private $entityManager;
 
     /** @var Translator */
     private $translator;
@@ -39,7 +40,13 @@ class ArticlePipe implements Subscriber
     private $applicationRequest;
 
     /** @var RouteEntity */
-    private $applicationRoute;
+    private $routeEntity;
+
+    /** @var PageEntity */
+    private $pageEntity;
+
+    /** @var PackageEntity */
+    private $packageEntity;
 
     /** @var ArticleEntity[] */
     private $articles = [];
@@ -50,60 +57,68 @@ class ArticlePipe implements Subscriber
     /**
      * ArticlePipe constructor.
      *
+     * @param boolean $autoFlush
      * @param ArticleRepository $articleRepository
-     * @param RouteRepository   $routeRepository
-     * @param Translator        $translator
-     * @param boolean           $autoFlush
+     * @param Translator $translator
+     * @param EntityManager $entityManager
      */
-    public function __construct(bool $autoFlush, ArticleRepository $articleRepository, RouteRepository $routeRepository, Translator $translator)
+    public function __construct(bool $autoFlush, ArticleRepository $articleRepository, Translator $translator, EntityManager $entityManager)
     {
+        $this->entityManager     = $entityManager;
         $this->articleRepository = $articleRepository;
-        $this->routeRepository   = $routeRepository;
         $this->translator        = $translator;
         $this->autoFlush         = $autoFlush;
     }
 
 
-    public function getArticle($namespace, $source, array $params = array(), $applicationRoute = true, $createEmptyIfNotExist = true)
+    public function getArticle($namespace, $source, array $params = array())
     {
         $modifyEntity = false;
+        $readyState   = true;
 
         $entity = null;
         if (isset($this->articles[$namespace])) {
             $entity = $this->articles[$namespace];
 
         } else {
-            /*
-             * find namespace and name
-             */
-            $findBy = ['identify.identifier' => $namespace];
 
-            if ($applicationRoute) {
-                $findBy['route'] = $this->getApplicationRoute();
-            }
+            try {
+                /*
+                 * set where find article
+                 */
+                $findBy = ['identify.identifier' => $namespace];
 
-            /** @var ArticleEntity $entity */
-            if (!$entity = $this->articleRepository->findOneBy($findBy)) {
-                if ($createEmptyIfNotExist) {
-                    $entity = $this->createDemoArticle($namespace, $applicationRoute);
-                    $entity->setPublic(true);
+                if ($params['page'] ?? false) {
+                    $findBy['page'] = $this->getPageEntity();
 
+                } elseif ($params['package'] ?? false) {
+                    $findBy['package'] = $this->getPackageEntity();
+
+                } elseif ($params['route'] ?? true) {
+                    $findBy['route'] = $this->getRouteEntity();
+                }
+
+                /** @var ArticleEntity $entity */
+                if (!$entity = $this->articleRepository->findOneBy($findBy)) {
+                    $entity = $this->createEmptyArticle($namespace, $findBy);
                     $modifyEntity = true;
                 }
-            }
 
-            $this->articles[$namespace] = $entity;
+                $this->articles[$namespace] = $entity;
+
+            } catch (\Devrun\CmsModule\NotFoundResourceException $exception) {
+                $readyState = false;
+                $this->articles[$namespace] = $entity;
+                $entity = $this->createEmptyArticle($namespace);
+                $entity->$source = $exception->getMessage();
+            }
         }
 
-        if ($params) {
-            $options = $entity->getIdentify()->getOptions();
-            if (!isset($options[$source])) {
-                $options[$source] = [
-                    'enable' => true,
-                    'type'   => isset($params['type']) ? $params['type'] : 'inline',
-                    'editor' => isset($params['editor']) ? $params['editor'] : 'simple',
-                ];
+        if ($readyState && $params) {
 
+            $options = $entity->getIdentify()->getOptions();
+            if (!isset($options[$source]) /* || $options != $params */) {
+                $options[$source] = $params;
                 $entity->getIdentify()->setOptions($options);
                 $this->articles[$namespace] = $entity;
 
@@ -130,7 +145,6 @@ class ArticlePipe implements Subscriber
 
                 $modifyEntity = true;
             }
-
         }
 
         if ($modifyEntity) {
@@ -141,49 +155,94 @@ class ArticlePipe implements Subscriber
              * @see FlushListener
              */
             $this->articleRepository->getEntityManager()->persist($entity);
+
             if (!$this->autoFlush) {
                 $this->articleRepository->getEntityManager()->flush();
             }
-
         }
-
-        return $entity;
-    }
-
-
-    private function createDemoArticle($namespace, $applicationRoute)
-    {
-        if (!$articleIdentifyEntity = $this->articleRepository->getEntityManager()->getRepository(ArticleIdentifyEntity::class)->findOneBy(['identifier' => $namespace])) {
-            $articleIdentifyEntity = new ArticleIdentifyEntity($namespace);
-        }
-
-        $entity = new ArticleEntity($this->translator, $articleIdentifyEntity);
-
-        if ($applicationRoute) {
-            $entity->setRoute($this->getApplicationRoute());
-        }
-
-        /*
-         * set header, subHeader, perex ...
-         */
 
         return $entity;
     }
 
 
     /**
-     * @return \Devrun\CmsModule\Entities\RouteEntity|null
+     * @param string $namespace
+     * @param array $params  [route => ..., page => ..., package => ...]
+     * @return ArticleEntity
      */
-    private function getApplicationRoute()
+    private function createEmptyArticle(string $namespace, array $params = [])
     {
-        if (null === $this->applicationRoute) {
-            if (!$this->applicationRoute = $this->routeRepository->getRouteFromApplicationRequest($this->applicationRequest)) {
-//                $this->applicationRoute = $this->routeRepository->findRouteFromApplicationPresenter($this->presenter);
+        if (!$articleIdentifyEntity = $this->articleRepository->getEntityManager()->getRepository(ArticleIdentifyEntity::class)->findOneBy(['identifier' => $namespace])) {
+            $articleIdentifyEntity = new ArticleIdentifyEntity($namespace);
+        }
+
+        $entity = (new ArticleEntity($this->translator, $articleIdentifyEntity));
+
+        if ($params['route'] ?? false) $entity->setRoute($this->getRouteEntity());
+        if ($params['page'] ?? false) $entity->setPage($this->getPageEntity());
+        if ($params['package'] ?? false) $entity->setPackage($this->getPackageEntity());
+
+        /*
+         * set header, subHeader, perex ...
+         */
+        $entity->setPublic(true);
+        return $entity;
+    }
+
+
+    /**
+     * @return \Devrun\CmsModule\Entities\RouteEntity
+     */
+    private function getRouteEntity(): RouteEntity
+    {
+        if (!$this->routeEntity) {
+            if ($route = $this->applicationRequest->getParameter('route')) {
+                $this->routeEntity = $this->entityManager->getRepository(RouteEntity::class)->find($route);
             }
         }
 
-        return $this->applicationRoute;
+        if (!$this->routeEntity) {
+            throw new NotFoundResourceException("Unknown route for article");
+        }
+        return $this->routeEntity;
     }
+
+    /**
+     * @return PageEntity
+     */
+    protected function getPageEntity(): PageEntity
+    {
+        if (!$this->pageEntity) {
+            if ($page = $this->applicationRequest->getParameter('page')) {
+                $this->pageEntity = $this->entityManager->getRepository(PageEntity::class)->find($page);
+            }
+        }
+
+        if (!$this->pageEntity) {
+            throw new NotFoundResourceException("Unknown page for article");
+        }
+        return $this->pageEntity;
+    }
+
+    /**
+     * @return PackageEntity
+     */
+    protected function getPackageEntity(): PackageEntity
+    {
+        if (!$this->packageEntity) {
+            if ($package = $this->applicationRequest->getParameter('package')) {
+                $this->packageEntity = $this->entityManager->getRepository(PackageEntity::class)->find($package);
+            }
+        }
+
+        if (!$this->packageEntity) {
+            throw new NotFoundResourceException("Unknown package for article");
+        }
+        return $this->packageEntity;
+    }
+
+
+
 
 
     /**
@@ -196,24 +255,24 @@ class ArticlePipe implements Subscriber
 
 
     /**
-     * @deprecated
-     *
-     * @param Application $application
+     * @param Presenter|TCmsPresenter $presenter
+     * @throws \ReflectionException
      */
-    public function onRequest(Application $application)
-    {
-        /** @var Presenter $presenter */
-        if ($presenter = $application->getPresenter()) {
-            $this->applicationRequest = $presenter->getRequest();
-
-        } else {
-            $this->applicationRequest = $application->getRequests()[0];
-        }
-    }
-
-
     public function onStartup(Presenter $presenter)
     {
+        if (isset(class_uses_recursive($presenter)[TCmsPresenter::class])) {
+
+            try {
+                $this->pageEntity    = $presenter->getPageEntity();
+                $this->routeEntity   = $presenter->getRouteEntity();
+                $this->packageEntity = $presenter->getPackageEntity();
+
+            } catch (\Devrun\CmsModule\NotFoundResourceException $exception) {
+
+            }
+
+        }
+
         $this->applicationRequest = $presenter->getRequest();
     }
 
@@ -226,7 +285,6 @@ class ArticlePipe implements Subscriber
     public function getSubscribedEvents()
     {
         return [
-//            'Nette\Application\Application::onRequest',
             'Nette\Application\UI\Presenter::onStartup'
         ];
 

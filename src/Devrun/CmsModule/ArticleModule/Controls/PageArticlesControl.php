@@ -42,15 +42,13 @@ class PageArticlesControl extends AdminControl
         $template->render();
     }
 
-    protected function attached($presenter)
+
+    public function __construct()
     {
-        if ($presenter instanceof PagePresenter) {
+        $this->monitor(PagePresenter::class, function (PagePresenter $presenter): void {
             $this->route = $presenter->getRouteEntity();
-        }
-
-        parent::attached($presenter);
+        });
     }
-
 
 
 
@@ -130,12 +128,17 @@ class PageArticlesControl extends AdminControl
     }
 
 
-
+    /**
+     * @param $name
+     * @return DataGrid
+     * @throws \Ublaboo\DataGrid\Exception\DataGridException
+     */
     protected function createComponentGrid($name)
     {
         $grid = new DataGrid();
         $grid->setTranslator($this->translator);
         $grid->setItemsPerPageList([15, 20, 30, 50, 100]);
+        $grid->setRefreshUrl(false);
 
 
         $query = $this->articleFacade->getArticleRepository()->createQueryBuilder('e')

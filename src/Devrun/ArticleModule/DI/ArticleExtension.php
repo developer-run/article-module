@@ -16,27 +16,20 @@ use Kdyby\Doctrine\DI\OrmExtension;
 use Kdyby\Events\DI\EventsExtension;
 use Nette;
 use Nette\DI\ContainerBuilder;
+use Nette\DI\Extensions\InjectExtension;
 
 class ArticleExtension extends CompilerExtension implements IEntityProvider
 {
-    public $defaults = array(
-        'lifeTime' => [
-            'article' => 2000,
-        ]
-    );
-
 
     public function loadConfiguration()
     {
         parent::loadConfiguration();
 
         $builder = $this->getContainerBuilder();
-        $config  = $this->getConfig($this->defaults);
-
+        $config  = $this->getConfig();
 
         $builder->addDefinition($this->prefix('presenter.translate'))
             ->setFactory('Devrun\CmsModule\ArticleModule\Presenters\TranslatePresenter');
-
 
         // forms
         $this->registerForms($builder);
@@ -49,7 +42,6 @@ class ArticleExtension extends CompilerExtension implements IEntityProvider
 
         // subscribers
         $this->registerSubscribers($builder);
-
     }
 
     public function beforeCompile()
@@ -59,7 +51,9 @@ class ArticleExtension extends CompilerExtension implements IEntityProvider
         /** @var ContainerBuilder $builder */
         $builder = $this->getContainerBuilder();
 
-        $registerToLatte = function (Nette\DI\ServiceDefinition $def) {
+
+
+        $registerToLatte = function (Nette\DI\Definitions\FactoryDefinition $def) {
             $def->addSetup('?->onCompile[] = function($engine) { Devrun\ArticleModule\Macros\UICmsMacros::install($engine->getCompiler()); }', ['@self']);
         };
 
@@ -75,18 +69,15 @@ class ArticleExtension extends CompilerExtension implements IEntityProvider
 
     private function registerForms(ContainerBuilder $builder)
     {
-        $builder->addDefinition($this->prefix('form.articleFormFactory'))
+        $builder->addFactoryDefinition($this->prefix('form.articleFormFactory'))
             ->setImplement('Devrun\CmsModule\ArticleModule\Forms\IArticleFormFactory')
-            ->setInject(true);
-
+            ->addTag(InjectExtension::TAG_INJECT);
 
     }
 
 
     private function registerRepositories(ContainerBuilder $builder)
     {
-        $config = $this->getConfig($this->defaults);
-
         $builder->addDefinition($this->prefix('repository.articleRepository'))
             ->setFactory('Devrun\ArticleModule\Repositories\ArticleRepository')
             ->addTag(OrmExtension::TAG_REPOSITORY_ENTITY, ArticleEntity::class);

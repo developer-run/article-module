@@ -10,11 +10,12 @@
 namespace Devrun\ArticleModule\Entities;
 
 use Devrun;
+use Devrun\CmsModule\Entities\PackageEntity;
 use Devrun\CmsModule\Entities\PageEntity;
+use Devrun\DoctrineModule\Entities\IdentifiedEntityTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Kdyby\Doctrine\Entities\Attributes\Identifier;
-use Kdyby\Doctrine\Entities\MagicAccessors;
+use Kdyby\Doctrine\MagicAccessors\MagicAccessors;
 use Kdyby\Translation\Translator;
 use Nette\Utils\DateTime;
 use Zenify\DoctrineBehaviors\Entities\Attributes\Translatable as ZenifyTranslatable;
@@ -30,13 +31,13 @@ use Zenify\DoctrineBehaviors\Entities\Attributes\Translatable as ZenifyTranslata
  * })
  *
  * @package Devrun\ArticleModule\Entities
- * @method setPublic($public)
+ * @method setPublic(bool $public)
  * @method ArticleTranslationEntity translate($lang = '', $fallbackToDefault = true)
  */
 class ArticleEntity
 {
     use MagicAccessors;
-    use Identifier;
+    use IdentifiedEntityTrait;
     use Devrun\DoctrineModule\Entities\DateTimeTrait;
     use Devrun\CmsModule\Entities\BlameableTrait;
     use Devrun\DoctrineModule\Entities\Attributes\Translatable;
@@ -52,6 +53,20 @@ class ArticleEntity
      * @ORM\JoinTable(name="article_pages", joinColumns={@ORM\JoinColumn(onDelete="RESTRICT")}, inverseJoinColumns={@ORM\JoinColumn(onDelete="RESTRICT")}  )
      */
     protected $pages;
+
+    /**
+     * @var PackageEntity
+     * @ORM\ManyToOne(targetEntity="Devrun\CmsModule\Entities\PackageEntity")
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     */
+    protected $package;
+
+    /**
+     * @var PageEntity
+     * @ORM\ManyToOne(targetEntity="Devrun\CmsModule\Entities\PageEntity")
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     */
+    protected $page;
 
     /**
      * není vyřešeno mazání sekcí článků !
@@ -283,6 +298,42 @@ class ArticleEntity
         return $this->route;
     }
 
+    /**
+     * @return PackageEntity
+     */
+    public function getPackage(): PackageEntity
+    {
+        return $this->package;
+    }
+
+    /**
+     * @param PackageEntity $package
+     * @return ArticleEntity
+     */
+    public function setPackage(PackageEntity $package): ArticleEntity
+    {
+        $this->package = $package;
+        return $this;
+    }
+
+    /**
+     * @return PageEntity
+     */
+    public function getPage(): PageEntity
+    {
+        return $this->page;
+    }
+
+    /**
+     * @param PageEntity $page
+     * @return ArticleEntity
+     */
+    public function setPage(PageEntity $page): ArticleEntity
+    {
+        $this->page = $page;
+        return $this;
+    }
+
 
 
 
@@ -299,6 +350,8 @@ class ArticleEntity
         $this->createdBy = null;
         $this->updatedBy = null;
         $this->deletedBy = null;
+        $this->inserted = null;
+        $this->updated = null;
     }
 
 }

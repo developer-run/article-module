@@ -47,6 +47,8 @@ class ArticlePresenterListener implements Subscriber
     public function onBeforeRender(Nette\Application\UI\Presenter $presenter)
     {
         $sortArticles = [];
+        $pageId       = $presenter->getParameter('page');
+        $packageId    = $presenter->getParameter('package');
 
         if (!$route = $this->routeRepository->getRouteFromApplicationRequest($presenter->getRequest())) {
             $route = $this->routeRepository->findRouteFromApplicationPresenter($presenter);
@@ -54,14 +56,24 @@ class ArticlePresenterListener implements Subscriber
 
         if ($route) {
             /** @var ArticleEntity[] $articles */
-            $articles = $this->articleRepository->createQueryBuilder('e')
+            $query = $this->articleRepository
+                ->createQueryBuilder('e')
                 ->addSelect('t')
                 ->addSelect('i')
                 ->addSelect('id')
                 ->leftJoin('e.translations', 't')
                 ->leftJoin('e.image', 'i')
                 ->leftJoin('e.identify', 'id')
-                ->where('e.route = :route')->setParameter('route', $route)
+                ->where('e.route = :route')->setParameter('route', $route);
+
+            if ($pageId) {
+                $query->orWhere('e.page = :page')->setParameter('page', $pageId);
+            }
+            if ($packageId) {
+                $query->orWhere('e.package = :package')->setParameter('package', $packageId);
+            }
+
+            $articles = $query
                 ->getQuery()
                 ->getResult();
 

@@ -10,7 +10,6 @@
 namespace Devrun\CmsModule\ArticleModule\Forms;
 
 use Devrun\CmsModule\Forms\DevrunForm;
-use Flame\Application\UI\Form;
 
 interface IArticleFormFactory
 {
@@ -42,14 +41,14 @@ class ArticleForm extends DevrunForm implements IArticleFormFactory
 
             } else {
                 $item = $this->addTextArea('header', 'Titulek', null, 8);
-                $item->setAttribute('class', "editable");
-                $item->setAttribute('placeholder', "titulek článku")
+                $item->setHtmlAttribute('class', "editable");
+                $item->setHtmlAttribute('placeholder', "titulek článku")
                     ->setMaxLength(255);
 
                 if ($this->editReference) {
                     $item = $this->addTextArea('refHeader', 'ref Titulek', null, 8);
-                    $item->setAttribute('class', "editable");
-                    $item->setAttribute('placeholder', "titulek článku")
+                    $item->setHtmlAttribute('class', "editable");
+                    $item->setHtmlAttribute('placeholder', "titulek článku")
                         ->setMaxLength(255);
                 }
             }
@@ -62,17 +61,20 @@ class ArticleForm extends DevrunForm implements IArticleFormFactory
                 if ($this->editReference) $item = $this->addHidden('refSubHeader');
 
             } else {
-                $item = $this->addTextArea('subHeader', 'Podtitulek', null, 8);
-                $item->setAttribute('class', "editable");
-                $item->setAttribute('placeholder', "Podtitulek článku")
-                    ->setMaxLength(255);
+                $item = $this->addHidden('subHeader');
+                if ($this->editReference) $item = $this->addHidden('refSubHeader');
 
-                if ($this->editReference) {
-                    $item = $this->addTextArea('refSubHeader', 'ref Podtitulek', null, 8);
-                    $item->setAttribute('class', "editable");
-                    $item->setAttribute('placeholder', "Podtitulek článku")
-                        ->setMaxLength(255);
-                }
+//                $item = $this->addTextArea('subHeader', 'Podtitulek', null, 8);
+//                $item->setHtmlAttribute('class', "editable");
+//                $item->setHtmlAttribute('placeholder', "Podtitulek článku")
+//                    ->setMaxLength(255);
+//
+//                if ($this->editReference) {
+//                    $item = $this->addTextArea('refSubHeader', 'ref Podtitulek', null, 8);
+//                    $item->setHtmlAttribute('class', "editable");
+//                    $item->setHtmlAttribute('placeholder', "Podtitulek článku")
+//                        ->setMaxLength(255);
+//                }
             }
 
         }
@@ -84,14 +86,14 @@ class ArticleForm extends DevrunForm implements IArticleFormFactory
 
             } else {
                 $item = $this->addTextArea('perex', 'Perex článku', null, 8);
-                $item->setAttribute('class', "editable");
-                $item->setAttribute('placeholder', "krátký popis článku")
+                $item->setHtmlAttribute('class', "editable");
+                $item->setHtmlAttribute('placeholder', "krátký popis článku")
                     ->setMaxLength(65535);
 
                 if ($this->editReference) {
                     $item = $this->addTextArea('refPerex', 'ref Perex článku', null, 8);
-                    $item->setAttribute('class', "editable");
-                    $item->setAttribute('placeholder', "krátký popis článku")
+                    $item->setHtmlAttribute('class', "editable");
+                    $item->setHtmlAttribute('placeholder', "krátký popis článku")
                         ->setMaxLength(65535);
                 }
             }
@@ -106,11 +108,11 @@ class ArticleForm extends DevrunForm implements IArticleFormFactory
 
             } else {
                 $item = $this->addTextArea('content', 'Text článku', null, 8);
-                $item->setAttribute('class', "editable");
+                $item->setHtmlAttribute('class', "editable");
 
                 if ($this->editReference) {
                     $item = $this->addTextArea('refContent', 'ref Text článku', null, 8);
-                    $item->setAttribute('class', "editable");
+                    $item->setHtmlAttribute('class', "editable");
                 }
             }
 
@@ -123,11 +125,11 @@ class ArticleForm extends DevrunForm implements IArticleFormFactory
 
             } else {
                 $item = $this->addTextArea('description', 'Poznámka', null, 8);
-                $item->setAttribute('class', "editable");
+                $item->setHtmlAttribute('class', "editable");
 
                 if ($this->editReference) {
                     $item = $this->addTextArea('refDescription', 'ref Poznámka', null, 8);
-                    $item->setAttribute('class', "editable");
+                    $item->setHtmlAttribute('class', "editable");
                 }
             }
 
@@ -173,9 +175,14 @@ class ArticleForm extends DevrunForm implements IArticleFormFactory
         return $result;
     }
 
+    /**
+     * @example old code [return isset($this->options[$column]['enable']) && $this->options[$column]['enable'];]
+     * @param $column
+     * @return bool
+     */
     private function isEnable($column)
     {
-        return isset($this->options[$column]['enable']) && $this->options[$column]['enable'];
+        return isset($this->options[$column]);
     }
 
     private function isInline($column)

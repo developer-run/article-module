@@ -18,13 +18,22 @@
 
 			{foreach $form->getComponents() as $name => $component}
 				{if $component instanceOf Nette\Forms\Controls\HiddenField && $name != '_do'}
-					<div class="form-group">
+					<div class="form-group d-flex">
 						<div class="col-sm-2 control-label">
 							<label>{$name|firstUpper}</label>
 						</div>
 						<div class="col-sm-10">
 							{input $name}
-							<p class="ck-inline cke_chrome" style="padding: 1em;" contenteditable="true" data-copy="[name='{$name}']" >{$component->value|noescape}</p>
+							{var $option = $presenter->getOptionsFor($article, $name)}
+
+                            <article class="editor"{ifset $option['data-toolbar']} data-toolbar='{$option['data-toolbar']}'{/ifset}{ifset $option['type']} data-type='{$option['type']}'{/ifset} data-copy="input[name='{$name}']">
+                                <div class="text-info">{$component->value|noescape}</div>
+                            </article>
+{*
+                            <article class="editor" data-toolbar='["heading", "|", "bold", "italic", "link", "|"]' data-copy="input[name='{$name}']">
+                                <div class="text-info">{$component->value|noescape}</div>
+                            </article>
+*}
 						</div>
 					</div>
 
@@ -42,6 +51,7 @@
 						</div>
 					{/if}
 				{/if}
+
 			{/foreach}
 		{/form}
 
@@ -53,40 +63,6 @@
 <script>
     $(document).ready(function () {
 
-        var introduction = $('textarea.editable:not(.cke_editable)');
-
-
-        $.each(introduction, function(index, value) {
-
-            CKEDITOR.replace( this, {
-                // Allow some non-standard markup that we used in the introduction.
-                extraAllowedContent: 'a(documentation);abbr[title];code',
-                removePlugins: 'stylescombo',
-                extraPlugins: 'sourcedialog',
-                // Show toolbar on startup (optional).
-                startupFocus: true
-            } );
-
-
-        });
-
-
-        var inlines = $('.ck-inline:not(.cke_editable)');
-
-
-/*
-        $.each(inlines, function(index, value) {
-            CKEDITOR.inline( this, {
-                // Allow some non-standard markup that we used in the introduction.
-                 extraAllowedContent: 'a(documentation);abbr[title];code',
-                 removePlugins: 'stylescombo',
-                 extraPlugins: 'sourcedialog',
-                // Show toolbar on startup (optional).
-                 startupFocus: true
-            } );
-
-        });
-*/
 
     });
 </script>
