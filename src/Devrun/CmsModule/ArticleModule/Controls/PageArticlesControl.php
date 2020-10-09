@@ -156,90 +156,77 @@ class PageArticlesControl extends AdminControl
 
 
         $grid->addColumnText('identifier', 'Klíč', 'identify.identifier')
-            ->setSortable()
-            ->setFilterText()
-            ->setCondition(function (\Kdyby\Doctrine\QueryBuilder $queryBuilder, $value) {
-                $queryBuilder->andWhere('id.identifier LIKE :likeIdentifier')->setParameter('likeIdentifier', "%$value%");
-            });
+             ->setSortable()
+             ->setFilterText()
+             ->setCondition(function (\Kdyby\Doctrine\QueryBuilder $queryBuilder, $value) {
+                 $queryBuilder->andWhere('id.identifier LIKE :likeIdentifier')->setParameter('likeIdentifier', "%$value%");
+             });
 
 
 
         $grid->addColumnText('header', 'Hlavička')
-            ->setRenderer(function (ArticleEntity $row) {
-                $options = $row->getIdentify()->getOptions();
-                $myOption = isset($options['header']) ? $options['header'] : [];
-                $result = Html::el('p')
-//                    ->setHtml($row->getHeader())
-                    ->setAttribute('disabled', 'true');
+             ->setRenderer(function (ArticleEntity $row) {
+                 $options = $row->getIdentify()->getOptions();
+                 $myOption = $options['header'] ?? [];
 
-                if ($myOption) {
-                    if ($myOption['enable'] && $myOption['type'] == 'inline') {
-                        $result = Html::el('p')
-                            ->setHtml($row->getHeader())
-                            ->setAttribute('contenteditable', 'true')
-                            ->setAttribute('data-namespace', $row->getIdentifier())
-                            ->setAttribute('data-source', 'header');
-                    }
-                }
+                 if (($myOption['type'] ?? 'none') == 'inline') {
+                     $result = Html::el('p')->setHtml($row->getHeader());
 
-                return $result;
-            })
-            ->setSortable()
-            ->setFilterText()
-            ->setCondition(function (\Kdyby\Doctrine\QueryBuilder $queryBuilder, $value) {
-                $queryBuilder->andWhere('t.header LIKE :like')->setParameter('like', "%$value%");
-            });
+                 } else {
+                     $result = Html::el('article')->setHtml($row->getHeader());
+                 }
+
+                 return $result;
+             })
+             ->setSortable()
+             ->setFilterText()
+             ->setCondition(function (\Kdyby\Doctrine\QueryBuilder $queryBuilder, $value) {
+                 $queryBuilder->andWhere('t.header LIKE :like')->setParameter('like', "%$value%");
+             });
 
         $grid->addColumnText('subHeader', "Sub hlavička", 'translation.subHeader')
-            ->setRenderer(function (ArticleEntity $row) {
-                $options = $row->getIdentify()->getOptions();
-                $myOption = isset($options['subHeader']) ? $options['subHeader'] : [];
-                $result = Html::el('p')
-//                    ->setHtml($row->getHeader())
-                    ->setAttribute('disabled', 'true');
+             ->setRenderer(function (ArticleEntity $row) {
+                 $options = $row->getIdentify()->getOptions();
+                 $myOption = $options['subHeader'] ?? [];
 
-                if ($myOption) {
-                    if ($myOption['enable'] && $myOption['type'] == 'inline') {
-                        $result = Html::el('p')
-                            ->setHtml($row->getSubHeader())
-                            ->setAttribute('contenteditable', 'true')
-                            ->setAttribute('data-namespace', $row->getIdentifier())
-                            ->setAttribute('data-source', 'subHeader');
-                    }
-                }
+                 if (($myOption['type'] ?? 'none') == 'inline') {
+                     $result = Html::el('p')->setHtml($row->getSubHeader());
 
-                return $result;
-            })
-            ->setSortable()
-            ->setFilterText()
-            ->setCondition(function (\Kdyby\Doctrine\QueryBuilder $queryBuilder, $value) {
-                $queryBuilder->andWhere('t.subHeader LIKE :like')->setParameter('like', "%$value%");
-            });
+                 } else {
+                     $result = Html::el('article')->setHtml($row->getSubHeader());
+                 }
+
+                 return $result;
+             })
+             ->setSortable()
+             ->setFilterText()
+             ->setCondition(function (\Kdyby\Doctrine\QueryBuilder $queryBuilder, $value) {
+                 $queryBuilder->andWhere('t.subHeader LIKE :like')->setParameter('like', "%$value%");
+             });
 
 
 
         $grid->addColumnText('description', 'Popis')
-            ->setSortable()
-            ->setFilterText();
-
+             ->setSortable()
+             ->setFilterText();
 
 
         $grid->addAction('edit', 'Edit')
-            ->setIcon('edit fa-2x')
-            ->setRenderer(function (ArticleEntity $article) {
-                $html = Html::el("a")
-                    ->addText(" Edit detail")
-                    ->setAttribute('class', 'btn btn-xs btn-default')
-                    ->setAttribute('data-modal-dialog', 'modal-info')
-                    ->setAttribute('data-modal-success', $this->link('redraw!', ['id' => $article->getId()]))
-                    ->setAttribute('data-modal-title', 'Úprava článku')
-                    ->setAttribute('data-modal-type', 'modal-lg')
-                    ->setAttribute('data-modal-autoclose', 'true')
-                    ->href($this->presenter->link(":Cms:Article:Default:edit", ['id' => $article->getId()]));
+             ->setIcon('edit fa-2x')
+             ->setRenderer(function (ArticleEntity $article) {
+                 $html = Html::el("a")
+                             ->addText(" Edit detail")
+                             ->setAttribute('class', 'btn btn-xs btn-default')
+                             ->setAttribute('data-modal-dialog', 'modal-info')
+                             ->setAttribute('data-modal-success', $this->link('redraw!', ['id' => $article->getId()]))
+                             ->setAttribute('data-modal-title', 'Úprava článku')
+                             ->setAttribute('data-modal-type', 'modal-lg')
+                             ->setAttribute('data-modal-autoclose', 'true')
+                             ->href($this->presenter->link(":Cms:Article:Default:edit", ['id' => $article->getId()]));
 
-                $html->insert(0, Html::el('span')->setAttribute('class', 'fa fa-edit fa-2x'));
-                return $html;
-            });
+                 $html->insert(0, Html::el('span')->setAttribute('class', 'fa fa-edit fa-2x'));
+                 return $html;
+             });
 
 
 //        $grid->addAction('delete', 'Delete', 'delete!')
